@@ -1,0 +1,44 @@
+server {
+	listen	80;
+	server_name rrrrthats5rs.com;
+	rewrite ^/(.*) http://www.rrrrthats5rs.com/$1 permanent;
+	}
+	
+server {
+	listen	80;
+	server_name www.rrrrthats5rs.com;
+	root /home/dho/rrrr/public;
+
+	location /{
+		access_log	off;
+		
+		set $test "";
+		
+		if ($request_method != GET) {
+			proxy_pass http://localhost:8088;
+            break;
+		}
+		
+		if ($request_filename ~ ^(.*)\/$){
+			set $test S;
+		}
+		
+		if (-f $request_filename/index.html) {
+			set $test "${test}F";
+		}
+		
+		if ($test = SF){
+			rewrite (.*) $1index.html break;
+		}
+        
+		if (!-f $request_filename) {
+		    proxy_pass http://localhost:5000;
+		    break;
+		}
+	}
+	location /media/{
+		access_log	off;
+		expires		30d;
+		break;
+	}
+}
